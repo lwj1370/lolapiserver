@@ -1,6 +1,7 @@
 *.pyc
 __pycache__
-lolapienv/
+
+lolapivenv/
 db.sqlite3
 /static
 .DS_Store
