@@ -8,7 +8,7 @@ from riotwatcher import LolWatcher, ApiError
 
 class UserViewSet(APIView):
     def post(self, request, *args, **kwargs):
-        api_key = 'RGAPI-d94a8dea-e7d9-4ad1-a066-51e75661d0a0'
+        api_key = ''
         # riotwatcher 참조
         # https://towardsdatascience.com/how-to-use-riot-api-with-python-b93be82dbbd6
         watcher = LolWatcher(api_key)
