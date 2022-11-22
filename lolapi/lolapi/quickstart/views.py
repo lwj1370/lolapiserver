@@ -1,3 +1,4 @@
+import os
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from rest_framework.views import APIView
@@ -11,7 +12,7 @@ from .common.utils import convertRawToGamerDictionary
 
 class GamerMatchViewSet(APIView):
     def post(self, request, *args, **kwargs):
-        api_key = 'RGAPI-3d62bc5d-f4ed-48c6-a550-eadc69d5cdfb'
+        api_key = os.environ['LOL_API_KEY']
         # riotwatcher 참조
         # https://towardsdatascience.com/how-to-use-riot-api-with-python-b93be82dbbd6
         watcher = LolWatcher(api_key)
