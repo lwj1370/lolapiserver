@@ -38,6 +38,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # http status 코드가 200이 아닐경우 필터링 처리해주는 Middleware
+    'lolapi.middleware.customHttpMiddleware.CustomHttpMiddleware'
 ]
 
 # CORS 관련 추가

@@ -18,7 +18,7 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('user/', include('lolapi.quickstart.urls')),
+    path('lol/', include('lolapi.quickstart.urls')),
     
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
