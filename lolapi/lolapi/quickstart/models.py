@@ -1,3 +1,2 @@
-from django.db import models
-
-# Create your models here.
+from .submodels.model_pro_gamer import *
+from .submodels.model_match import *

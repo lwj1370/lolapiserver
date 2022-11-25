@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+from datetime import timedelta
 from django.contrib.auth.models import User, Group
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -6,7 +8,7 @@ from riotwatcher import LolWatcher, ApiError
 
 from .serializers import GamerMatchSerializer
 
-from .common.utils import convertRawToGamerDictionary
+from .common.utils import *
 
 class GamerMatchViewSet(APIView):
     def post(self, request, *args, **kwargs):
@@ -21,6 +23,7 @@ class GamerMatchViewSet(APIView):
         nickname = request.data["nickname"] if "nickname" in request.data else (request.GET["nickname"] if "nickname" in request.GET else "")
 
         if(nickname == ""): 
+            print('nickname is Empty')
             result['nickname_validation'] = False
             return Response(result)
 
@@ -34,14 +37,19 @@ class GamerMatchViewSet(APIView):
         try:
             account = watcher.summoner.by_name(region, nickname)
             matches = watcher.match.matchlist_by_puuid(region, account['puuid'])
-            lastMatch = matches[0]
-            participants = watcher.match.by_id(region, lastMatch)['info']['participants']
+            matchInfo = watcher.match.by_id(region, matches[0])['info']
+            
+            participants = matchInfo['participants']
             participants = [participant for participant in participants if participant['puuid'] == account['puuid']]
-            result['matchId'] = lastMatch
+            
+            result['matchId'] = matches[0]
+            result['startTime'] = datetime.fromtimestamp(matchInfo['gameStartTimestamp'] // 1000)
+            result['endTime'] = datetime.fromtimestamp(matchInfo['gameEndTimestamp'] // 1000)
+            result['duration'] = convertSecondsToTime(matchInfo['gameDuration'])
             result['gamer'].update(convertRawToGamerDictionary(participants[0]))
 
         except ApiError as err:
-            print(f'Api Failed : {err.response.status_code}')
+            print(f'Lol Api Request Failed : {err.response.status_code}')
 
         return Response(result)
     
