@@ -7,4 +7,4 @@ class ProGamer(models.Model):
     lane_position = models.CharField(max_length = 30)
 
     def __str__(self) -> str:
-        return self.gamer_nickname
+        return self.__class__.__name__

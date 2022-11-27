@@ -16,15 +16,16 @@ class GamerMatchViewSet(APIView):
         print(f'request.data : {request.data["nickname"] if "nickname" in request.data else "Nickname - Not Found"}')
 
         result = {}
-        result['matchId'] = 'Not Found'
-        result['gamer'] = {}
-        result['nickname_validation'] = True
+        match = result['match']
+        match['matchId'] = 'Not Found'
+        # result['gamer'] = {}
+        match['nickname_validation'] = True
 
         nickname = request.data["nickname"] if "nickname" in request.data else (request.GET["nickname"] if "nickname" in request.GET else "")
 
         if(nickname == ""): 
             print('nickname is Empty')
-            result['nickname_validation'] = False
+            match['nickname_validation'] = False
             return Response(result)
 
         api_key = os.environ['LOL_API_KEY']
@@ -42,11 +43,11 @@ class GamerMatchViewSet(APIView):
             participants = matchInfo['participants']
             participants = [participant for participant in participants if participant['puuid'] == account['puuid']]
             
-            result['matchId'] = matches[0]
-            result['startTime'] = datetime.fromtimestamp(matchInfo['gameStartTimestamp'] // 1000)
-            result['endTime'] = datetime.fromtimestamp(matchInfo['gameEndTimestamp'] // 1000)
-            result['duration'] = convertSecondsToTime(matchInfo['gameDuration'])
-            result['gamer'].update(convertRawToGamerDictionary(participants[0]))
+            match['matchId'] = matches[0]
+            match['startTime'] = datetime.fromtimestamp(matchInfo['gameStartTimestamp'] // 1000)
+            match['endTime'] = datetime.fromtimestamp(matchInfo['gameEndTimestamp'] // 1000)
+            match['duration'] = convertSecondsToTime(matchInfo['gameDuration'])
+            result['match'].update(convertRawToGamerDictionary(participants[0]))
 
         except ApiError as err:
             print(f'Lol Api Request Failed : {err.response.status_code}')

@@ -10,7 +10,7 @@ class GameMatch(models.Model):
     endTime = models.DateTimeField(blank=False)
     duration = models.CharField(max_length=20)
     requested_time = models.DateTimeField(default=timezone.now)
-    pro_gamer = models.ForeignKey(ProGamer, on_delete=models.CASCADE)
+    pro_gamer = models.ForeignKey(ProGamer)
 
     def __str__(self) -> str:
-        return self.matchId
+        return self.__class__.__name__
