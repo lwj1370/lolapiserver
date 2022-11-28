@@ -126,8 +126,10 @@ def convertRawToGamerDictionary(participant):
     data['ward'] = ward
 
     # 게임 결과
-    data['win'] = participant['win']
-    data['gameEndedInEarlySurrender'] = participant['gameEndedInEarlySurrender']
-    data['gameEndedInSurrender'] = participant['gameEndedInSurrender']
+    detail = {}
+    detail['win'] = participant['win']
+    detail['gameEndedInEarlySurrender'] = participant['gameEndedInEarlySurrender']
+    detail['gameEndedInSurrender'] = participant['gameEndedInSurrender']
+    data['detail'] = detail
 
     return data
