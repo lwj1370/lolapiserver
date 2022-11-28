@@ -3,6 +3,7 @@ import pytz
 
 from pytz import timezone
 from datetime import datetime
+from django.db import DatabaseError, transaction
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -33,7 +34,6 @@ class GamerMatchViewSet(APIView):
         result['match'] = {}
         match = result['match']
         match['matchId'] = 'Not Found'
-        # result['gamer'] = {}
         match['nickname_validation'] = True
 
         nickname = request.data["nickname"] if "nickname" in request.data else (request.GET["nickname"] if "nickname" in request.GET else "")
@@ -54,7 +54,7 @@ class GamerMatchViewSet(APIView):
             
             diff = now - lastRequestedTime
             diffMins = diff.total_seconds() // 60
-            print(diffMins)
+            
             if diffMins <= 30:
                 
                 gd = GameDamage.objects.filter(match=matches[0]).values()[0]
@@ -112,61 +112,67 @@ class GamerMatchViewSet(APIView):
 
         except ApiError as err:
             print(f'Lol Api Request Failed : {err.response.status_code}')
+        except Exception as e:
+            print(e)
         except:
-            print('Exception')
+            print('Unknown Exception')
 
         try:
-            tmpGameMatch = GameMatch()
-            tmpGameMatch.pro_gamer = pg
-            tmpGameMatch.setJsonData(result['match'])
-            GameMatch.save(tmpGameMatch)
-            
-            tmpGameDamage = GameDamage()
-            tmpGameDamage.match = tmpGameMatch
-            tmpGameDamage.setJsonData(result['match']['damage'])
-            GameDamage.save(tmpGameDamage)
+            with transaction.atomic():
+                tmpGameMatch = GameMatch()
+                tmpGameMatch.pro_gamer = pg
+                tmpGameMatch.setJsonData(result['match'])
+                GameMatch.save(tmpGameMatch)
+                
+                tmpGameDamage = GameDamage()
+                tmpGameDamage.match = tmpGameMatch
+                tmpGameDamage.setJsonData(result['match']['damage'])
+                GameDamage.save(tmpGameDamage)
 
-            tmpGameInfo = GameInfo()
-            tmpGameInfo.match = tmpGameMatch
-            tmpGameInfo.setJsonData(result['match']['info'])
-            GameInfo.save(tmpGameInfo)
+                tmpGameInfo = GameInfo()
+                tmpGameInfo.match = tmpGameMatch
+                tmpGameInfo.setJsonData(result['match']['info'])
+                GameInfo.save(tmpGameInfo)
 
-            tmpGameItem = GameItem()
-            tmpGameItem.match = tmpGameMatch
-            tmpGameItem.setJsonData(result['match']['item'])
-            GameItem.save(tmpGameItem)
+                tmpGameItem = GameItem()
+                tmpGameItem.match = tmpGameMatch
+                tmpGameItem.setJsonData(result['match']['item'])
+                GameItem.save(tmpGameItem)
 
-            tmpGameJungle = GameJungle()
-            tmpGameJungle.match = tmpGameMatch
-            tmpGameJungle.setJsonData(result['match']['jungle'])
-            GameJungle.save(tmpGameJungle)
+                tmpGameJungle = GameJungle()
+                tmpGameJungle.match = tmpGameMatch
+                tmpGameJungle.setJsonData(result['match']['jungle'])
+                GameJungle.save(tmpGameJungle)
 
-            tmpGameKill = GameKill()
-            tmpGameKill.match = tmpGameMatch
-            tmpGameKill.setJsonData(result['match']['kill'])
-            GameKill.save(tmpGameKill)
+                tmpGameKill = GameKill()
+                tmpGameKill.match = tmpGameMatch
+                tmpGameKill.setJsonData(result['match']['kill'])
+                GameKill.save(tmpGameKill)
 
-            tmpGameSpell = GameSpell()
-            tmpGameSpell.match = tmpGameMatch
-            tmpGameSpell.setJsonData(result['match']['spell'])
-            GameSpell.save(tmpGameSpell)
+                tmpGameSpell = GameSpell()
+                tmpGameSpell.match = tmpGameMatch
+                tmpGameSpell.setJsonData(result['match']['spell'])
+                GameSpell.save(tmpGameSpell)
 
-            tmpGameTurret = GameTurret()
-            tmpGameTurret.match = tmpGameMatch
-            tmpGameTurret.setJsonData(result['match']['turret'])
-            GameTurret.save(tmpGameTurret)
+                tmpGameTurret = GameTurret()
+                tmpGameTurret.match = tmpGameMatch
+                tmpGameTurret.setJsonData(result['match']['turret'])
+                GameTurret.save(tmpGameTurret)
 
-            tmpGameWard = GameWard()
-            tmpGameWard.match = tmpGameMatch
-            tmpGameWard.setJsonData(result['match']['ward'])
-            GameWard.save(tmpGameWard)
+                tmpGameWard = GameWard()
+                tmpGameWard.match = tmpGameMatch
+                tmpGameWard.setJsonData(result['match']['ward'])
+                GameWard.save(tmpGameWard)
 
-            tmpGameWinRate = GamerWinRate()
-            tmpGameWinRate.match = tmpGameMatch
-            tmpGameWinRate.setJsonData(result['match']['detail'])
-            GamerWinRate.save(tmpGameWinRate)
-        except:
-            print('Exception')
+                tmpGameWinRate = GamerWinRate()
+                tmpGameWinRate.match = tmpGameMatch
+                tmpGameWinRate.setJsonData(result['match']['detail'])
+                GamerWinRate.save(tmpGameWinRate)
+            raise DatabaseError('정보 저장에 실패하였습니다.')
+        except DatabaseError as e:
+            print(e)
+        except Exception as e:
+            print(e)
 
         return Response(result)
     
