@@ -13,7 +13,7 @@ class GameMatch(models.Model):
     pro_gamer = models.ForeignKey(ProGamer, on_delete=models.CASCADE)
 
     def setJsonData(self, json):
-        print(f'{self.__str__} : setJsonData Start')
+        print(f'{self.__str__()} : setJsonData Start')
 
         self.matchId = json['matchId']
         self.nickaname_validation = json['nickname_validation']
@@ -21,7 +21,7 @@ class GameMatch(models.Model):
         self.endTime = json['endTime']
         self.duration = json['duration']
 
-        print(f'{self.__str__} : setJsonData End')
+        print(f'{self.__str__()} : setJsonData End')
 
     def __str__(self) -> str:
         return self.__class__.__name__

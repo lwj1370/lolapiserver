@@ -25,6 +25,13 @@ from .submodels.model_match_win_rate import GamerWinRate
 
 from .common.utils import *
 
+class GamerListViewSet(APIView):
+    def post(self, request, *args, **kwargs):
+        print('Pro-Gamer List Requested')
+        allGamers = ProGamer.objects.all()
+        print(f'Pro-Gamer List : {allGamers.values()}')
+        return Response(allGamers.values())
+
 class GamerMatchViewSet(APIView):
     def post(self, request, *args, **kwargs):
         print(f'request.GET : {request.GET["nickname"] if "nickname" in request.GET else "Nickname - Not Found"}')
@@ -48,14 +55,17 @@ class GamerMatchViewSet(APIView):
         try:
             pg = ProGamer.objects.get(gamer_nickname=nickname)
             matches = GameMatch.objects.filter(pro_gamer=pg.pk)
-            now = datetime.now(timezone('Asia/Seoul'))
             
+            if len(matches) == 0:
+                return Response(result)
+            
+            now = datetime.now(timezone('Asia/Seoul'))
             lastRequestedTime = matches[len(matches) - 1].requested_time
             
             diff = now - lastRequestedTime
             diffMins = diff.total_seconds() // 60
-            
-            if diffMins <= 30:
+            print(f'Requested {diffMins} minutes ago')
+            if diffMins <= 30000:
                 
                 gd = GameDamage.objects.filter(match=matches[0]).values()[0]
                 gInfo = GameInfo.objects.filter(match=matches[0]).values()[0]
@@ -77,7 +87,8 @@ class GamerMatchViewSet(APIView):
                 match['turret'] = gt
                 match['ward'] = gw
                 match['detail'] = gwr
-
+                result['match'].update(match)
+                print(result)
                 return Response(result)
 
         except ProGamer.DoesNotExist:
@@ -168,7 +179,6 @@ class GamerMatchViewSet(APIView):
                 tmpGameWinRate.match = tmpGameMatch
                 tmpGameWinRate.setJsonData(result['match']['detail'])
                 GamerWinRate.save(tmpGameWinRate)
-            raise DatabaseError('정보 저장에 실패하였습니다.')
         except DatabaseError as e:
             print(e)
         except Exception as e:

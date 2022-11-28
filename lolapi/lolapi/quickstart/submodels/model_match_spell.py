@@ -11,7 +11,7 @@ class GameSpell(models.Model):
     match = models.ForeignKey(GameMatch, on_delete=models.CASCADE)
 
     def setJsonData(self, json):
-        print(f'{self.__str__} : setJsonData Start')
+        print(f'{self.__str__()} : setJsonData Start')
 
         self.abilityUses = json['abilityUses']
         self.spell1Casts = json['spell1Casts']
@@ -19,7 +19,7 @@ class GameSpell(models.Model):
         self.spell3Casts = json['spell3Casts']
         self.spell4Casts = json['spell4Casts']
 
-        print(f'{self.__str__} : setJsonData End')
+        print(f'{self.__str__()} : setJsonData End')
 
     def __str__(self) -> str:
         return self.__class__.__name__

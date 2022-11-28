@@ -11,7 +11,7 @@ class GameWard(models.Model):
     match = models.ForeignKey(GameMatch, on_delete=models.CASCADE)
 
     def setJsonData(self, json):
-        print(f'{self.__str__} : setJsonData Start')
+        print(f'{self.__str__()} : setJsonData Start')
 
         self.visionClearedPings = json['visionClearedPings']
         self.visionScore = json['visionScore']
@@ -19,7 +19,7 @@ class GameWard(models.Model):
         self.wardsKilled = json['wardsKilled']
         self.wardsPlaced = json['wardsPlaced']
 
-        print(f'{self.__str__} : setJsonData End')
+        print(f'{self.__str__()} : setJsonData End')
 
     def __str__(self) -> str:
         return self.__class__.__name__

@@ -9,13 +9,13 @@ class GameJungle(models.Model):
     match = models.ForeignKey(GameMatch, on_delete=models.CASCADE)
 
     def setJsonData(self, json):
-        print(f'{self.__str__} : setJsonData Start')
+        print(f'{self.__str__()} : setJsonData Start')
 
         self.baronTakedowns = json['baronTakedowns']
         self.dragonTakedowns = json['dragonTakedowns']
         self.elderDragonMultikills = json['elderDragonMultikills']
         
-        print(f'{self.__str__} : setJsonData End')
+        print(f'{self.__str__()} : setJsonData End')
         
 
     def __str__(self) -> str:

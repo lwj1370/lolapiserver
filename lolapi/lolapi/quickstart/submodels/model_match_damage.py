@@ -23,7 +23,7 @@ class GameDamage(models.Model):
     match = models.ForeignKey(GameMatch, on_delete=models.CASCADE)
 
     def setJsonData(self, json):
-        print(f'{self.__str__} : setJsonData Start')
+        print(f'{self.__str__()} : setJsonData Start')
 
         self.damagePerMinute = json['damagePerMinute']
         self.totalDamageDealt = json['totalDamageDealt']
@@ -43,7 +43,7 @@ class GameDamage(models.Model):
         self.physicalDamageDealtToChampions = json['physicalDamageDealtToChampions']
         self.physicalDamageTaken = json['physicalDamageTaken']
 
-        print(f'{self.__str__} : setJsonData End')
+        print(f'{self.__str__()} : setJsonData End')
 
     def __str__(self) -> str:
         return self.__class__.__name__
