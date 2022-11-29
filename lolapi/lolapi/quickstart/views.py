@@ -53,11 +53,12 @@ class GamerMatchViewSet(APIView):
         pg = ProGamer()
 
         try:
+            print(f'Requested Nickname select query start : {nickname}')
             pg = ProGamer.objects.get(gamer_nickname=nickname)
             matches = GameMatch.objects.filter(pro_gamer=pg.pk)
             
             if len(matches) == 0:
-                return Response(result)
+                raise ObjectDoesNotExist('이전 매치 정보를 찾을수 없습니다.')
             
             now = datetime.now(timezone('Asia/Seoul'))
             lastRequestedTime = matches[len(matches) - 1].requested_time
@@ -88,7 +89,9 @@ class GamerMatchViewSet(APIView):
                 match['ward'] = gw
                 match['detail'] = gwr
                 result['match'].update(match)
-                print(result)
+                
+                print('DB 조회 데이터 전달')
+
                 return Response(result)
 
         except ProGamer.DoesNotExist:
@@ -104,22 +107,28 @@ class GamerMatchViewSet(APIView):
         try:
             api_key = os.environ['LOL_API_KEY']
 
+            print('Lol Open Api Request Start')
             # riotwatcher 참조
             # https://towardsdatascience.com/how-to-use-riot-api-with-python-b93be82dbbd6
             watcher = LolWatcher(api_key)
             region = 'kr'
-            
+
             account = watcher.summoner.by_name(region, nickname)
             matches = watcher.match.matchlist_by_puuid(region, account['puuid'])
             matchInfo = watcher.match.by_id(region, matches[0])['info']
             participants = matchInfo['participants']
             participants = [participant for participant in participants if participant['puuid'] == account['puuid']]
             
+            print('Requested Info Parsing...')
+
             match['matchId'] = matches[0]
             match['startTime'] = datetime.fromtimestamp(matchInfo['gameStartTimestamp'] // 1000, pytz.timezone('Asia/Seoul'))
             match['endTime'] = datetime.fromtimestamp(matchInfo['gameEndTimestamp'] // 1000, pytz.timezone('Asia/Seoul'))
             match['duration'] = convertSecondsToTime(matchInfo['gameDuration'])
+            
             match.update(convertRawToGamerDictionary(participants[0]))
+
+            print(f'Api Request Result : {result}')
 
         except ApiError as err:
             print(f'Lol Api Request Failed : {err.response.status_code}')
@@ -130,55 +139,67 @@ class GamerMatchViewSet(APIView):
 
         try:
             with transaction.atomic():
+                
                 tmpGameMatch = GameMatch()
                 tmpGameMatch.pro_gamer = pg
                 tmpGameMatch.setJsonData(result['match'])
                 GameMatch.save(tmpGameMatch)
+                print('match saved')
                 
                 tmpGameDamage = GameDamage()
                 tmpGameDamage.match = tmpGameMatch
                 tmpGameDamage.setJsonData(result['match']['damage'])
                 GameDamage.save(tmpGameDamage)
+                print('damage saved')
 
                 tmpGameInfo = GameInfo()
                 tmpGameInfo.match = tmpGameMatch
                 tmpGameInfo.setJsonData(result['match']['info'])
                 GameInfo.save(tmpGameInfo)
+                print('info saved')
 
                 tmpGameItem = GameItem()
                 tmpGameItem.match = tmpGameMatch
                 tmpGameItem.setJsonData(result['match']['item'])
                 GameItem.save(tmpGameItem)
+                print('item saved')
 
                 tmpGameJungle = GameJungle()
                 tmpGameJungle.match = tmpGameMatch
                 tmpGameJungle.setJsonData(result['match']['jungle'])
                 GameJungle.save(tmpGameJungle)
+                print('jungle saved')
 
                 tmpGameKill = GameKill()
                 tmpGameKill.match = tmpGameMatch
                 tmpGameKill.setJsonData(result['match']['kill'])
                 GameKill.save(tmpGameKill)
+                print('kill saved')
 
                 tmpGameSpell = GameSpell()
                 tmpGameSpell.match = tmpGameMatch
                 tmpGameSpell.setJsonData(result['match']['spell'])
                 GameSpell.save(tmpGameSpell)
+                print('spell saved')
 
                 tmpGameTurret = GameTurret()
                 tmpGameTurret.match = tmpGameMatch
                 tmpGameTurret.setJsonData(result['match']['turret'])
                 GameTurret.save(tmpGameTurret)
+                print('turret saved')
 
                 tmpGameWard = GameWard()
                 tmpGameWard.match = tmpGameMatch
                 tmpGameWard.setJsonData(result['match']['ward'])
                 GameWard.save(tmpGameWard)
+                print('ward saved')
 
                 tmpGameWinRate = GamerWinRate()
                 tmpGameWinRate.match = tmpGameMatch
                 tmpGameWinRate.setJsonData(result['match']['detail'])
                 GamerWinRate.save(tmpGameWinRate)
+                print('win rate saved')
+
         except DatabaseError as e:
             print(e)
         except Exception as e:
