@@ -125,6 +125,7 @@ class GamerMatchViewSet(APIView):
             match['startTime'] = datetime.fromtimestamp(matchInfo['gameStartTimestamp'] // 1000, pytz.timezone('Asia/Seoul'))
             match['endTime'] = datetime.fromtimestamp(matchInfo['gameEndTimestamp'] // 1000, pytz.timezone('Asia/Seoul'))
             match['duration'] = convertSecondsToTime(matchInfo['gameDuration'])
+            match['matchType'] = matchInfo['gameType']
             
             match.update(convertRawToGamerDictionary(participants[0]))
 

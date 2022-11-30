@@ -9,6 +9,7 @@ class GameMatch(models.Model):
     endTime = models.DateTimeField(blank=False)
     duration = models.CharField(max_length=20)
     requested_time = models.DateTimeField(default=timezone.now)
+    matchType = models.CharField(max_length=20, default='None')
     
     pro_gamer = models.ForeignKey(ProGamer, on_delete=models.CASCADE)
 
@@ -20,6 +21,7 @@ class GameMatch(models.Model):
         self.startTime = json['startTime']
         self.endTime = json['endTime']
         self.duration = json['duration']
+        self.duration = json['matchType']
 
         print(f'{self.__str__()} : setJsonData End')
 
