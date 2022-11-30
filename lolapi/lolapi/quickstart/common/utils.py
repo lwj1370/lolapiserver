@@ -1,13 +1,13 @@
 
 def convertSecondsToTime(duration):
     if duration > 3600:
-        hours = 3600 // 60
+        hours = duration // 60
         minutes = hours // 60
-        seconds = minutes % 60
+        seconds = hours % 60
         return f'{hours}시간 {minutes}분 {seconds}초'
 
     minutes = duration // 60
-    seconds = minutes % 60
+    seconds = duration % 60
 
     return f'{minutes}분 {seconds}초'
 
