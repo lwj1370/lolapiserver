@@ -11,7 +11,6 @@ LOL_API_KEY = os.environ['LOL_API_KEY']
 SECRET_KEY = os.environ['SECRET_KEY']
 config = os.environ['config']
 
-
 ALLOWED_HOSTS = []
 
 # Application definition
@@ -25,8 +24,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'riotwatcher',
-    'lolapi.quickstart',
     'corsheaders',
+    'apiserver.lolapi',
+    'apiserver.rottentomatoapi',
 ]
 
 MIDDLEWARE = [
@@ -39,7 +39,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # http status 코드가 200이 아닐경우 필터링 처리해주는 Middleware
-    'lolapi.middleware.customHttpMiddleware.CustomHttpMiddleware'
+    'apiserver.middleware.customHttpMiddleware.CustomHttpMiddleware'
 ]
 
 # CORS 관련 추가
@@ -54,7 +54,7 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
 ]
 CORS_ALLOW_CREDENTIALS = True
 
-ROOT_URLCONF = 'lolapi.urls'
+ROOT_URLCONF = 'apiserver.urls'
 
 TEMPLATES = [
     {
@@ -72,7 +72,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'lolapi.wsgi.application'
+WSGI_APPLICATION = 'apiserver.wsgi.application'
 
 
 # Database
@@ -139,5 +139,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
 
-    'EXCEPTION_HANDLER': 'config.exceptions.api_exception.custom_exception_handler'
+    # 'EXCEPTION_HANDLER': 'config.exceptions.api_exception.custom_exception_handler'
+    'EXCEPTION_HANDLER': {
+        'apiserver.lolapi.exceptions.api_exception.custom_exception_handler', 
+        'apiserver.rottentomatoapi.exceptions.api_exception.custom_exception_handler'
+        }
 }

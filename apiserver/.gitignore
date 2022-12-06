@@ -1,0 +1,14 @@
+# 파이썬 컴파일/캐시 파일 제외
+*.pyc
+__pycache__
+.DS_Store
+# python 가상환경
+apivenv/
+# 기본 sqlite 파일
+db.sqlite3
+# static 파일
+/static
+# db migrations 파일
+migrations
+# 로컬 설정 파일
+.env
